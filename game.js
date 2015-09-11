@@ -13,6 +13,7 @@ BasicGame.Game.prototype = {
     this.load.spritesheet('player', 'assets/player.png', 64, 64);
   },
   
+  
   create: function () {
 
     this.sea = this.add.tileSprite(0, 0, 800, 600, 'sea');
@@ -33,17 +34,28 @@ BasicGame.Game.prototype = {
     
     this.bullets = [];
     
+    
+    
     this.cursors = this.input.keyboard.createCursorKeys();
+    this.keys = this.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
   },
 
   update: function () {
+    //scroll map
     this.sea.tilePosition.y += 0.2;
-    this.physics.arcade.overlap(this.bullet, this.enemy, this.enemyHit, null, this);
     
+    //bullet collision check
+    for (var i = 0; i < this.bullets.length; i++) {
+      this.physics.arcade.overlap(
+      this.bullets[i], this.enemy, this.enemyHit, null, this
+      );
+    }
+    
+    //reset player velocity after key is let go
     this.player.body.velocity.x = 0;
     this.player.body.velocity.y = 0;
     
-    if (this.cursors.left.isDown) {
+    if (this.cursors.left.isDown || this.input.keyboard.isDown(Phaser.Keyboard.S)) {
       this.player.body.velocity.x = -this.player.speed;
     }
     else if (this.cursors.right.isDown) {
@@ -58,9 +70,13 @@ BasicGame.Game.prototype = {
       this.player.body.velocity.y = this.player.speed;
     }
     
-    if (this.input.keyboard.isDown(Phaser.Keyboard.z)) {
-      this.fire();
+    if (this.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
+          
+          this.fire();
     }
+    var key1;
+    key1 = this.input.keyboard.addKey(Phaser.Keyboard.ONE);
+    key1.onDown.add(fire, this);
     
   },
   
@@ -69,8 +85,7 @@ BasicGame.Game.prototype = {
 
   quitGame: function (pointer) {
 
-    //  Here you should destroy anything you no longer need.
-    //  Stop music, delete sprites, purge caches, free resources, all that good stuff.
+
 
     //  Then let's go back to the main menu.
     this.state.start('MainMenu');
@@ -93,6 +108,8 @@ BasicGame.Game.prototype = {
      this.physics.enable(bullet, Phaser.Physics.ARCADE);
      bullet.body.velocity.y = -500;
      this.bullets.push(bullet);
- },
+     
+     console.log('bullet fired');
+ }
 
 };
