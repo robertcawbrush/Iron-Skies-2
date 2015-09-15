@@ -31,7 +31,7 @@ BasicGame.Game.prototype = {
     this.enemyPool.enableBody = true;
     this.enemyPool.physicsBodyType = Phaser.Physics.ARCADE;
     
-    this.enemyPool.createMultiple (50, 'smallEnemy');
+    this.enemyPool.createMultiple (5, 'smallEnemy');
     this.enemyPool.setAll('anchor.x', 0.5);
     this.enemyPool.setAll('anchor.y', 0.5);
     this.enemyPool.setAll('outOfBoundsKill', true);
@@ -76,7 +76,7 @@ BasicGame.Game.prototype = {
 
   update: function () {
     //scroll map
-    this.sea.tilePosition.y += 0.2;
+    this.sea.tilePosition.y += 1;
     
     //bullet collision check
     this.physics.arcade.overlap(this.bulletPool, this.enemyPool, this.enemyHit, null, this);
@@ -89,7 +89,7 @@ BasicGame.Game.prototype = {
       //DEBUG
       enemy.reset(this.rnd.integerInRange(20, 780), 0);
       //randomize speed
-      enemy.body.velocity = this.rnd.integerInRange(30, 60);
+      enemy.body.velocity.y = this.rnd.integerInRange(30, 60);
       enemy.play('fly');
     }
     
