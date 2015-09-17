@@ -70,6 +70,10 @@ BasicGame.Game.prototype = {
     
     this.enemyPool.forEach(function (enemy) {
       enemy.animations.add('fly', [0,1,2], 20, true);
+      enemy.animations.add('hit', [3,1,3,2], 20,true);
+      enemy.events.onAnimationComplete( function(e){
+        e.play('fly');
+      }, this);
     });
     
     this.nextEnemyAt = 0;
@@ -142,9 +146,9 @@ BasicGame.Game.prototype = {
 
   enemyHit: function(bullet, enemy) {
     bullet.kill();
-    this.explode(enemy);
-    enemy.kill();
     
+    this.damageEnemy(enemy, basicGame.BULLET_DAMAGE);
+  
   },
   
   fire: function() {
@@ -175,7 +179,7 @@ BasicGame.Game.prototype = {
     this.physics.arcade.overlap(this.bulletPool1, this.enemyPool, this.enemyHit, null, this);
     
     //player collision check
-    this.physics.arcade.overlap(this.player, this.enemy, this.playerHit, null, this);
+    this.physics.arcade.overlap(this.player, this.enemyPool, this.playerHit, null, this);
  },
  
   spawnEnemies: function () {
@@ -185,7 +189,9 @@ BasicGame.Game.prototype = {
       var enemy = this.enemyPool.getFirstExists(false);
       
       //DEBUG
-      enemy.reset(this.rnd.integerInRange(20, this.game.width - 20), 0);
+      enemy.reset(this.rnd.integerInRange(20, this.game.width - 20), 0, 
+                                          basicGame.ENEMY_HEALTH);
+                                          
       //randomize speed
       enemy.body.velocity.y = this.rnd.integerInRange(30, 60);
       enemy.play('fly');
@@ -219,10 +225,18 @@ BasicGame.Game.prototype = {
  },
  
   playerHit: function (player, enemy){
-   enemy.kill();
-   this.explode(enemy);
    player.kill();
+   this.damgeEnemy(enemy, basicGame.CRASH_DAMAGE);
  },
+  
+  damageEnemy: function(enemy, damage){
+    enemy.damage(damage);
+    if (enemy.alive) {
+      enemy.play('hit');
+    } else {
+      this.explode('enemy');
+    }
+  },
  
   explode: function (sprite) {
    if (this.explosionPool.countDead() === 0){
