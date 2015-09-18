@@ -71,7 +71,7 @@ BasicGame.Game.prototype = {
     this.enemyPool.forEach(function (enemy) {
       enemy.animations.add('fly', [0,1,2], 20, true);
       enemy.animations.add('hit', [3,1,3,2], 20,true);
-      enemy.events.onAnimationComplete( function(e){
+      enemy.events.onAnimationComplete.add( function(e){
         e.play('fly');
       }, this);
     });
