@@ -147,7 +147,7 @@ BasicGame.Game.prototype = {
   enemyHit: function(bullet, enemy) {
     bullet.kill();
     
-    this.damageEnemy(enemy, basicGame.BULLET_DAMAGE);
+    this.damageEnemy(enemy, BasicGame.BULLET_DAMAGE);
   
   },
   
@@ -190,7 +190,7 @@ BasicGame.Game.prototype = {
       
       //DEBUG
       enemy.reset(this.rnd.integerInRange(20, this.game.width - 20), 0, 
-                                          basicGame.ENEMY_HEALTH);
+                                          BasicGame.ENEMY_HEALTH);
                                           
       //randomize speed
       enemy.body.velocity.y = this.rnd.integerInRange(30, 60);
@@ -234,7 +234,7 @@ BasicGame.Game.prototype = {
     if (enemy.alive) {
       enemy.play('hit');
     } else {
-      this.explode('enemy');
+      this.explode(enemy);
     }
   },
  
