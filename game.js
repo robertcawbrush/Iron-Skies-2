@@ -226,7 +226,7 @@ BasicGame.Game.prototype = {
  
   playerHit: function (player, enemy){
    player.kill();
-   this.damgeEnemy(enemy, basicGame.CRASH_DAMAGE);
+   this.damageEnemy(enemy, BasicGame.CRASH_DAMAGE);
  },
   
   damageEnemy: function(enemy, damage){
