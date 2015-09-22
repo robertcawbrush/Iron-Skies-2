@@ -21,6 +21,8 @@ BasicGame.Game.prototype = {
     this.setupEnemies();
     this.setupBullets();
     this.setupExplosions();
+    this.setupPlayerIcons();
+    this.setupText();
  
     //input inits
       //arrow keys
@@ -35,6 +37,7 @@ BasicGame.Game.prototype = {
     this.checkCollisions();
     this.spawnEnemies();
     this.processPlayerInput();
+    this.processDelayedEffects();
   },
   
   render: function() {
@@ -51,6 +54,7 @@ BasicGame.Game.prototype = {
     this.player = this.add.sprite(this.game.width / 2, this.game.height - 50, 'player');
     this.player.anchor.setTo(0.5, 0.5);
     this.player.animations.add('fly', [0,1,2], 20, true);
+    this.player.animations.add('ghost', [3, 0, 3, 1], 20, true);
     this.player.play('fly');
     this.physics.enable(this.player, Phaser.Physics.ARCADE);
     this.player.speed = 300;
@@ -67,10 +71,11 @@ BasicGame.Game.prototype = {
     this.enemyPool.setAll('anchor.y', 0.5);
     this.enemyPool.setAll('outOfBoundsKill', true);
     this.enemyPool.setAll('checkWorldBounds', true);
+    this.enemyPool.setAll('reward', BasicGame.ENEMY_REWARD, false, false, 0, true);
     
     this.enemyPool.forEach(function (enemy) {
       enemy.animations.add('fly', [0,1,2], 20, true);
-      enemy.animations.add('hit', [3,1,3,2], 20,true);
+      enemy.animations.add('hit', [3,1,3,2], 20, false);
       enemy.events.onAnimationComplete.add( function(e){
         e.play('fly');
       }, this);
@@ -135,6 +140,28 @@ BasicGame.Game.prototype = {
     this.explosionPool.forEach(function (explosion){
       explosion.animations.add('boom');
     });
+  },
+  
+  setupPlayerIcons: function () {
+    this.lives = this.add.group();
+    
+    var firstLifeIconX = this.game.width - 10 - (BasicGame.PLAYER_EXTRA_LIVES * 30);
+    for (var i = 0; i < BasicGame.PLAYER_EXTRA_LIVES; i++) {
+      var life = this.lives.create(firstLifeIconX + (30 * i), 30, 'player');
+      life.scale.setTo(0.5, 0.5);
+      life.anchor.setTo(0.5, 0.5);
+    }
+  },
+  
+  setupText: function () {
+    
+    this.score = 0;
+    this.scoreText = this.add.text(
+                                    this.game.width / 2, 30, '' + this.score,
+                                    {font: '20 monospace', fill: '#fff', align: 'center' }
+                                  );
+                                  
+    this.scoreText.anchor.setTo(0.5, 0.5);
   },
 
   quitGame: function (pointer) {
@@ -224,9 +251,29 @@ BasicGame.Game.prototype = {
     }
  },
  
+ processDelayedEffects: function () {
+   if(this.ghostUntil && this.ghostUntil < this.time.now) {
+     this.ghostUntil = null;
+     this.player.play('fly');
+   }
+ },
+ 
   playerHit: function (player, enemy){
-   player.kill();
+    if(this.ghostUntil && this.ghostUntil > this.time.now) {
+      return;
+    }
+  
    this.damageEnemy(enemy, BasicGame.CRASH_DAMAGE);
+   
+   var life = this.lives.getFirstAlive();
+   if(life !== null) {
+     life.kill();
+     this.ghostUntil = this.time.now + BasicGame.PLAYER_GHOST_TIME;
+     this.player.play('ghost');
+   } else {
+     this.explode(player);
+     player.kill();
+   }
  },
   
   damageEnemy: function(enemy, damage){
@@ -235,7 +282,13 @@ BasicGame.Game.prototype = {
       enemy.play('hit');
     } else {
       this.explode(enemy);
+      this.addToScore(enemy.reward);
     }
+  },
+  
+  addToScore: function (score) {
+    this.score += score;
+    this.scoreText = this.score;
   },
  
   explode: function (sprite) {
