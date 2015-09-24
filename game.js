@@ -8,7 +8,7 @@ BasicGame.Game.prototype = {
   preload: function () {
     this.load.image('sea', 'assets/sea.png');
     this.load.image('bullet', 'assets/bullet.png');
-    this.load.spritesheet('smallEnemy', 'assets/enemy.png', 42, 42);
+    this.load.spritesheet('smallTarget', 'assets/enemy.png', 42, 42);
     this.load.spritesheet('explosion', 'assets/explosion.png', 32, 32);
     this.load.spritesheet('player', 'assets/player.png', 64, 64);
   },
@@ -63,17 +63,17 @@ BasicGame.Game.prototype = {
   },
   
   setupEnemies: function() {
-    this.enemyPool = this.add.group();
-    this.enemyPool.enableBody = true;
-    this.enemyPool.physicsBodyType = Phaser.Physics.ARCADE;
-    this.enemyPool.createMultiple(30, 'smallEnemy');
-    this.enemyPool.setAll('anchor.x', 0.5);
-    this.enemyPool.setAll('anchor.y', 0.5);
-    this.enemyPool.setAll('outOfBoundsKill', true);
-    this.enemyPool.setAll('checkWorldBounds', true);
-    this.enemyPool.setAll('reward', BasicGame.ENEMY_REWARD, false, false, 0, true);
+    this.smallTargetPool = this.add.group();
+    this.smallTargetPool.enableBody = true;
+    this.smallTargetPool.physicsBodyType = Phaser.Physics.ARCADE;
+    this.smallTargetPool.createMultiple(30, 'smallTarget');
+    this.smallTargetPool.setAll('anchor.x', 0.5);
+    this.smallTargetPool.setAll('anchor.y', 0.5);
+    this.smallTargetPool.setAll('outOfBoundsKill', true);
+    this.smallTargetPool.setAll('checkWorldBounds', true);
+    this.smallTargetPool.setAll('reward', BasicGame.ENEMY_REWARD, false, false, 0, true);
     
-    this.enemyPool.forEach(function (enemy) {
+    this.smallTargetPool.forEach(function (enemy) {
       enemy.animations.add('fly', [0,1,2], 20, true);
       enemy.animations.add('hit', [3,1,3,2], 20, false);
       enemy.events.onAnimationComplete.add( function(e){
@@ -166,7 +166,6 @@ BasicGame.Game.prototype = {
 
   quitGame: function (pointer) {
 
-    //  Then let's go back to the main menu.
     this.state.start('MainMenu');
 
   },
@@ -203,17 +202,17 @@ BasicGame.Game.prototype = {
  
   checkCollisions: function () {
     //bullet collision check
-    this.physics.arcade.overlap(this.bulletPool1, this.enemyPool, this.enemyHit, null, this);
+    this.physics.arcade.overlap(this.bulletPool1, this.smallTargetPool, this.enemyHit, null, this);
     
     //player collision check
-    this.physics.arcade.overlap(this.player, this.enemyPool, this.playerHit, null, this);
+    this.physics.arcade.overlap(this.player, this.smallTargetPool, this.playerHit, null, this);
  },
  
   spawnEnemies: function () {
    //enemySpawn set to random
-    if (this.nextEnemyAt < this.time.now && this.enemyPool.countDead() > 0) {
+    if (this.nextEnemyAt < this.time.now && this.smallTargetPool.countDead() > 0) {
       this.nextEnemyAt = this.time.now + this.enemyDelay;
-      var enemy = this.enemyPool.getFirstExists(false);
+      var enemy = this.smallTargetPool.getFirstExists(false);
       
       //DEBUG
       enemy.reset(this.rnd.integerInRange(20, this.game.width - 20), 0, 
@@ -251,7 +250,7 @@ BasicGame.Game.prototype = {
     }
  },
  
- processDelayedEffects: function () {
+  processDelayedEffects: function () {
    if(this.ghostUntil && this.ghostUntil < this.time.now) {
      this.ghostUntil = null;
      this.player.play('fly');
