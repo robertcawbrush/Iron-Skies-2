@@ -13,7 +13,6 @@ BasicGame.Game.prototype = {
     this.load.spritesheet('player', 'assets/player.png', 64, 64);
   },
   
-  
   create: function () {
     
     this.setupBackground();
@@ -41,7 +40,7 @@ BasicGame.Game.prototype = {
   },
   
   render: function() {
-    this.game.debug.body(this.player);
+    //this.game.debug.body(this.player);
   },
   
   setupBackground: function () {
@@ -203,6 +202,7 @@ BasicGame.Game.prototype = {
   checkCollisions: function () {
     //bullet collision check
     this.physics.arcade.overlap(this.bulletPool1, this.smallTargetPool, this.enemyHit, null, this);
+    this.physics.arcade.overlap(this.bulletPool2, this.smallTargetPool, this.enemyHit, null, this);
     
     //player collision check
     this.physics.arcade.overlap(this.player, this.smallTargetPool, this.playerHit, null, this);
@@ -255,6 +255,15 @@ BasicGame.Game.prototype = {
      this.ghostUntil = null;
      this.player.play('fly');
    }
+   
+   if(this.showReturn && this.time.now > this.showReturn){
+     this.returnText = this.add.text(
+      this.game.width / 2, this.game.height / 2 + 20,
+      'Press Space to return to the main Menu',
+      { font: '16px serif', fill: '#fff'}
+      );
+      this.returnText.anchor.setTo(0.5, 0.5);
+   }
  },
  
   playerHit: function (player, enemy){
@@ -272,6 +281,7 @@ BasicGame.Game.prototype = {
    } else {
      this.explode(player);
      player.kill();
+     this.displayEnd(false);
    }
  },
   
@@ -288,6 +298,12 @@ BasicGame.Game.prototype = {
   addToScore: function (score) {
     this.score += score;
     this.scoreText = this.score;
+    
+    if (this.score >= 2000) {
+      //this.explode(this.enemyPool);
+      this.enemyPool.destroy();
+      this.displayEnd(true);
+    }
   },
  
   explode: function (sprite) {
@@ -299,6 +315,34 @@ BasicGame.Game.prototype = {
    explosion.play('boom', 15, false, true);
    explosion.body.velocity.y = sprite.body.velocity.y;
    explosion.body.velocity.x = sprite.body.velocity.x;
- }
+ },
+ 
+  displayEnd: function(win){
+    if (this.endText && this.endText.exists){
+      return;
+    }
+    
+    var msg= win ? 'VICTORY' : 'DEFEAT';
+    this.endText = this.add.text(
+                                  this.game.width / 2, this.game.height / 2, 
+                                  {font: '72px serif', fill: '#fff'}
+                                );
+    this.endText.anchor.setTo(0.5, 0);
+    
+    this.showReturn = this.time.now + BasicGame.RETURN_MESSAGE_DELAY;
+  },
+  
+  quitGame: function(pointer) {
+    this.sea.destroy();
+    this.player.destroy();
+    this.enemyPool.destroy();
+    this.bulletPool.destroy();
+    this.explosionPool.destroy();
+    this.scoreText.destroy();
+    this.endText.destroy();
+    this.returnText.destroy();
+    
+    this.state.start('mainMenu');
+  }
 
 };
