@@ -228,25 +228,31 @@ BasicGame.Game.prototype = {
    //reset player velocity after key is let go
     this.player.body.velocity.x = 0;
     this.player.body.velocity.y = 0;
-    
-    if (this.cursors.left.isDown || this.keyboard.isDown(Phaser.Keyboard.A)) {
-      this.player.body.velocity.x = -this.player.speed;
-    }
-    else if (this.cursors.right.isDown || this.keyboard.isDown(Phaser.Keyboard.D)) {
-      this.player.body.velocity.x = this.player.speed;
+    if(this.returnText && this.returnText.exists){
       
     }
-    
-    if (this.cursors.up.isDown || this.keyboard.isDown(Phaser.Keyboard.W)) {
-      this.player.body.velocity.y = -this.player.speed;
-    }
-    else if (this.cursors.down.isDown || this.keyboard.isDown(Phaser.Keyboard.S)) {
-      this.player.body.velocity.y = this.player.speed;
-    }
+      if (this.cursors.left.isDown || this.keyboard.isDown(Phaser.Keyboard.A)) {
+        this.player.body.velocity.x = -this.player.speed;
+      }
+      else if (this.cursors.right.isDown || this.keyboard.isDown(Phaser.Keyboard.D)) {
+        this.player.body.velocity.x = this.player.speed;
+        
+      }
+      
+      if (this.cursors.up.isDown || this.keyboard.isDown(Phaser.Keyboard.W)) {
+        this.player.body.velocity.y = -this.player.speed;
+      }
+      else if (this.cursors.down.isDown || this.keyboard.isDown(Phaser.Keyboard.S)) {
+        this.player.body.velocity.y = this.player.speed;
+      }
     
     if (this.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
-          
+        if(this.returnText && this.returnText.exists) {
+          this.quitGame();
+        } else {
           this.fire();
+        }
+          
     }
  },
  
@@ -258,9 +264,9 @@ BasicGame.Game.prototype = {
    
    if(this.showReturn && this.time.now > this.showReturn){
      this.returnText = this.add.text(
-      this.game.width / 2, this.game.height / 2 + 20,
+      this.game.width / 2, this.game.height / 2 + 100,
       'Press Space to return to the main Menu',
-      { font: '16px serif', fill: '#fff'}
+      { font: '26px serif', fill: '#fff'}
       );
       this.returnText.anchor.setTo(0.5, 0.5);
    }
@@ -291,17 +297,17 @@ BasicGame.Game.prototype = {
       enemy.play('hit');
     } else {
       this.explode(enemy);
-      this.addToScore(enemy.reward);
+      this.addToScore(BasicGame.ENEMY_REWARD);
     }
   },
   
-  addToScore: function (score) {
-    this.score += score;
-    this.scoreText = this.score;
+  addToScore: function (reward) {
+    this.score += reward;
+    this.scoreText.text = this.score;
+    console.log('this.score = ' + this.score);
     
     if (this.score >= 2000) {
-      //this.explode(this.enemyPool);
-      this.enemyPool.destroy();
+      this.smallTargetPool.destroy();
       this.displayEnd(true);
     }
   },
@@ -317,14 +323,15 @@ BasicGame.Game.prototype = {
    explosion.body.velocity.x = sprite.body.velocity.x;
  },
  
-  displayEnd: function(win){
+  displayEnd: function(win) {
     if (this.endText && this.endText.exists){
       return;
     }
     
-    var msg= win ? 'VICTORY' : 'DEFEAT';
+    var msg = win ? 'VICTORY' : 'DEFEAT';
     this.endText = this.add.text(
-                                  this.game.width / 2, this.game.height / 2, 
+                                  this.game.width / 2, this.game.height / 2,
+                                  msg, 
                                   {font: '72px serif', fill: '#fff'}
                                 );
     this.endText.anchor.setTo(0.5, 0);
@@ -335,8 +342,9 @@ BasicGame.Game.prototype = {
   quitGame: function(pointer) {
     this.sea.destroy();
     this.player.destroy();
-    this.enemyPool.destroy();
-    this.bulletPool.destroy();
+    this.smallTargetPool.destroy();
+    this.bulletPool1.destroy();
+    this.bulletPool2.destroy();
     this.explosionPool.destroy();
     this.scoreText.destroy();
     this.endText.destroy();
