@@ -228,9 +228,8 @@ BasicGame.Game.prototype = {
    //reset player velocity after key is let go
     this.player.body.velocity.x = 0;
     this.player.body.velocity.y = 0;
-    if(this.returnText && this.returnText.exists){
-      
-    }
+    
+    if(this.player.alive){  
       if (this.cursors.left.isDown || this.keyboard.isDown(Phaser.Keyboard.A)) {
         this.player.body.velocity.x = -this.player.speed;
       }
@@ -245,6 +244,8 @@ BasicGame.Game.prototype = {
       else if (this.cursors.down.isDown || this.keyboard.isDown(Phaser.Keyboard.S)) {
         this.player.body.velocity.y = this.player.speed;
       }
+    
+    }
     
     if (this.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
         if(this.returnText && this.returnText.exists) {
@@ -270,6 +271,7 @@ BasicGame.Game.prototype = {
       );
       this.returnText.anchor.setTo(0.5, 0.5);
    }
+   
  },
  
   playerHit: function (player, enemy){
@@ -284,6 +286,7 @@ BasicGame.Game.prototype = {
      life.kill();
      this.ghostUntil = this.time.now + BasicGame.PLAYER_GHOST_TIME;
      this.player.play('ghost');
+     this.player.reset(this.game.width / 2, this.game.height - 50, 0 , 1);
    } else {
      this.explode(player);
      player.kill();
@@ -306,7 +309,7 @@ BasicGame.Game.prototype = {
     this.scoreText.text = this.score;
     console.log('this.score = ' + this.score);
     
-    if (this.score >= 2000) {
+    if (this.score >= 100) {
       this.smallTargetPool.destroy();
       this.displayEnd(true);
     }
@@ -340,17 +343,17 @@ BasicGame.Game.prototype = {
   },
   
   quitGame: function(pointer) {
-    this.sea.destroy();
+    this.sea.destroy(); //Experimenting with title background
     this.player.destroy();
     this.smallTargetPool.destroy();
     this.bulletPool1.destroy();
     this.bulletPool2.destroy();
     this.explosionPool.destroy();
     this.scoreText.destroy();
-    this.endText.destroy();
     this.returnText.destroy();
+    this.endText.destroy();
     
-    this.state.start('mainMenu');
+    this.state.start('MainMenu');
   }
 
 };
