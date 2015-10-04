@@ -309,7 +309,7 @@ BasicGame.Game.prototype = {
     this.scoreText.text = this.score;
     console.log('this.score = ' + this.score);
     
-    if (this.score >= 100) {
+    if (this.score >= 2000) {
       this.smallTargetPool.destroy();
       this.displayEnd(true);
     }
@@ -343,7 +343,7 @@ BasicGame.Game.prototype = {
   },
   
   quitGame: function(pointer) {
-    this.sea.destroy(); //Experimenting with title background
+    this.sea.destroy();
     this.player.destroy();
     this.smallTargetPool.destroy();
     this.bulletPool1.destroy();
