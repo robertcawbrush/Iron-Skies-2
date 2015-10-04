@@ -1,13 +1,33 @@
+.border-radius (@radius: 5px) {
+	-webkit-border-radius: @radius;
+	-moz-border-radius: @radius;
+	border-radius: @radius;
+}
+.box-shadow (@x: 0px, @y: 3px, @blur: 5px, @alpha: 0.5) {
+	-webkit-box-shadow: @x @y @blur rgba(0, 0, 0, @alpha);
+	-moz-box-shadow: @x @y @blur rgba(0, 0, 0, @alpha);
+	box-shadow: @x @y @blur rgba(0, 0, 0, @alpha);
+}
 
 * html .centered { position:absolute }
 
 html {
-    background-color: ##F0EAD6;
-}
-#gameContainer {
+    background-color: #333;
     position: absolute;
     top : 50%;
     left: 50%;
     
     transform: translate(-50%, -50%);
+    
+    color: #fff;
+    
+}
+
+#gameContainer {
+    border: 5px solid #fce62a;
+    .border-radius(5px);
+    
+    .box-shadow(8px, 8px, 10px, 0.3);
+     
+
 }

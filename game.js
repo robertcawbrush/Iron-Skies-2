@@ -307,7 +307,6 @@ BasicGame.Game.prototype = {
   addToScore: function (reward) {
     this.score += reward;
     this.scoreText.text = this.score;
-    console.log('this.score = ' + this.score);
     
     if (this.score >= 2000) {
       this.smallTargetPool.destroy();
