@@ -8,6 +8,6 @@ window.onload = function() {
   game.state.add('Game', BasicGame.Game);
 
   //Init the Boot state.
-  game.state.start('Game');
+  game.state.start('MainMenu');
 
 };

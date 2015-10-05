@@ -18,7 +18,7 @@ BasicGame.MainMenu.prototype = {
     this.setupBackground();
     this.add.sprite(0, 0, 'titlePage');
 
-    this.loadingText = this.add.text(this.game.width / 2, this.game.height / 2 + 80, "Press Space to start", { font: "20px monospace", fill: "#fff" });
+    this.loadingText = this.add.text(this.game.width / 2 - 15, this.game.height / 2 + 100, "Press Space to start", { font: "20px monospace", fill: "#fff" });
     this.loadingText.anchor.setTo(0.5, 0.5);
 
   },
