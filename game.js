@@ -318,7 +318,7 @@ BasicGame.Game.prototype = {
     this.score += reward;
     this.scoreText.text = this.score;
     
-    if (this.score >= 100) {
+    if (this.score >= 5000) {
       this.smallTargetPool.destroy();
       this.displayEnd(true);
     }
