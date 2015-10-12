@@ -158,11 +158,6 @@ BasicGame.Game.prototype = {
     this.scoreText.anchor.setTo(0.5, 0.5);
   },
 
-  quitGame: function (pointer) {
-
-    this.state.start('MainMenu');
-
-  },
 
   enemyHit: function(bullet, enemy) {
     bullet.kill();
@@ -276,7 +271,7 @@ BasicGame.Game.prototype = {
      this.player.play('fly');
    }
    
-   if(this.showReturn && this.time.now > this.showReturn){
+   if(this.showReturn && this.time.now > this.showReturn && !this.returnText){
      this.returnText = this.add.text(
       this.game.width / 2, this.game.height / 2 + 100,
       'Press Space to return to the main Menu',
@@ -323,7 +318,7 @@ BasicGame.Game.prototype = {
     this.score += reward;
     this.scoreText.text = this.score;
     
-    if (this.score >= 5000) {
+    if (this.score >= 100) {
       this.smallTargetPool.destroy();
       this.displayEnd(true);
     }
