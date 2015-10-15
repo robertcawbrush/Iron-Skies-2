@@ -11,6 +11,7 @@ BasicGame.Game.prototype = {
     this.load.image('enemyBullet', 'assets/enemy-bullet.png');
     this.load.image('powerup1', 'assets/powerup1.png');
     this.load.spritesheet('smallTarget', 'assets/enemy.png', 42, 42);
+    this.load.spritesheet('bossEnemy', 'assets/EnemyLargeBig.png', 403, 199);
     this.load.spritesheet('explosion', 'assets/explosion.png', 32, 32);
     this.load.spritesheet('player', 'assets/player.png', 64, 64);
   },
@@ -65,27 +66,57 @@ BasicGame.Game.prototype = {
   },
   
   setupEnemies: function() {
-    this.smallTargetPool = this.add.group();
-    this.smallTargetPool.enableBody = true;
-    this.smallTargetPool.physicsBodyType = Phaser.Physics.ARCADE;
-    this.smallTargetPool.createMultiple(30, 'smallTarget');
-    this.smallTargetPool.setAll('anchor.x', 0.5);
-    this.smallTargetPool.setAll('anchor.y', 0.5);
-    this.smallTargetPool.setAll('outOfBoundsKill', true);
-    this.smallTargetPool.setAll('checkWorldBounds', true);
-    this.smallTargetPool.setAll('reward', BasicGame.ENEMY_REWARD, false, false, 0, true);
-    this.smallTargetPool.setAll('dropRate', BasicGame.ENEMY_DROP_RATE, false, false,0, true);
+    //smallTarget properties  
+      this.smallTargetPool = this.add.group();
+      this.smallTargetPool.enableBody = true;
+      this.smallTargetPool.physicsBodyType = Phaser.Physics.ARCADE;
+      this.smallTargetPool.createMultiple(30, 'smallTarget');
+      this.smallTargetPool.setAll('anchor.x', 0.5);
+      this.smallTargetPool.setAll('anchor.y', 0.5);
+      this.smallTargetPool.setAll('outOfBoundsKill', true);
+      this.smallTargetPool.setAll('checkWorldBounds', true);
+      this.smallTargetPool.setAll('reward', BasicGame.ENEMY_REWARD, false, false, 0, true);
+      this.smallTargetPool.setAll('dropRate', BasicGame.ENEMY_DROP_RATE, false, false,0, true);
+      
+      //smallTarget Animations
+      this.smallTargetPool.forEach(function (enemy) {
+        enemy.animations.add('fly', [0,1,2], 20, true);
+        enemy.animations.add('hit', [3, 1, 3, 2], 20, false);
+        
+        enemy.events.onAnimationComplete.add( function(e){
+          e.play('fly');
+        }, this);
+        
+      });
+      
+      this.nextEnemyAt = 0;
+      this.enemyDelay = 1000;
     
-    this.smallTargetPool.forEach(function (enemy) {
-      enemy.animations.add('fly', [0,1,2], 20, true);
-      enemy.animations.add('hit', [3,1,3,2], 20, false);
-      enemy.events.onAnimationComplete.add( function(e){
-        e.play('fly');
-      }, this);
-    });
-    
-    this.nextEnemyAt = 0;
-    this.enemyDelay = 1000;
+    //boss properties
+      this.bossEnemyPool = this.add.group();
+      this.bossEnemyPool.enableBody = true;
+      this.bossEnemyPool.physicsBodyType = Phaser.Physics.ARCADE;
+      this.bossEnemyPool.createMultiple(1, 'bossEnemy');
+      this.bossEnemyPool.setAll('anchor.x', 0.5);
+      this.bossEnemyPool.setAll('anchor.y', 0.5);
+      this.bossEnemyPool.setAll('outOfBoundsKill', true);
+      this.bossEnemyPool.setAll('checkWorldBounds', true);
+      this.bossEnemyPool.setAll('reward', BasicGame.BOSS_REWARD, false, false, 0, true);
+      this.bossEnemyPool.setAll('dropRate', BasicGame.BOSS_DROP_RATE, false, false, 0, true);
+      
+      //boss animations
+      this.bossEnemyPool.forEach(function (boss) {
+        boss.animations.add('fly', [0, 1, 1], 20, true);
+        boss.animations.add('hit', [1, 3, 2, 0], 20, true);
+        
+        boss.events.onAnimationComplete.add( function (b) {
+          b.play('fly');
+        } ,this);
+        
+      });
+      
+      this.bossEnemy = this.bossEnemyPool.getTop();
+      this.bossUnlocked = false;
   },
   
   setupBullets: function() {
@@ -98,7 +129,7 @@ BasicGame.Game.prototype = {
     this.bulletPool.physicsBodyType = Phaser.Physics.ARCADE;
       
     //create 'magazine'
-    this.bulletPool.createMultiple(100, 'bullet');
+    this.bulletPool.createMultiple(150, 'bullet');
       
     this.bulletPool.setAll('anchor.x', 0.5);
     this.bulletPool.setAll('anchor.y', 0.5);
@@ -158,7 +189,6 @@ BasicGame.Game.prototype = {
     this.scoreText.anchor.setTo(0.5, 0.5);
   },
 
-
   enemyHit: function(bullet, enemy) {
     bullet.kill();
     
@@ -215,6 +245,12 @@ BasicGame.Game.prototype = {
     //player collision check
     this.physics.arcade.overlap(this.player, this.smallTargetPool, this.playerHit, null, this);
     this.physics.arcade.overlap(this.player, this.powerUpPool, this.playerPowerUp, null, this);
+    
+    if(this.bossUnlocked === false) {
+      this.physics.arcade.overlap(this.bulletPool, this.bossEnemyPool, this.enemyHit, null, this);
+      
+      this.physics.arcade.overlap(this.player, this.bossEnemyPool, this.playerHit, null, this);
+    }
  },
  
   spawnEnemies: function () {
@@ -266,19 +302,34 @@ BasicGame.Game.prototype = {
  },
  
   processDelayedEffects: function () {
-   if(this.ghostUntil && this.ghostUntil < this.time.now) {
-     this.ghostUntil = null;
-     this.player.play('fly');
-   }
+   //Player Effects
+     if(this.ghostUntil && this.ghostUntil < this.time.now) {
+       this.ghostUntil = null;
+       this.player.play('fly');
+     }
    
-   if(this.showReturn && this.time.now > this.showReturn && !this.returnText){
-     this.returnText = this.add.text(
-      this.game.width / 2, this.game.height / 2 + 100,
-      'Press Space to return to the main Menu',
-      { font: '26px serif', fill: '#fff'}
-      );
-      this.returnText.anchor.setTo(0.5, 0.5);
-   }
+   //Boss Effects
+    if (this.bossUnlocked && this.bossEnemy.y > 80) {
+      this.bossUnlocked = false;
+      this.boss.nextShotAt = 0;
+      
+      this.bossEnemy.body.velocity.y = 0;
+      this.bossEnemy.body.velocity.s = BasicGame.BOSS_X_VELOCITY;
+      
+      //these two lines keep the boss on the canvas and bounces the boss off the walls
+      this.bossEnemy.body.bounce.x = 1;
+      this.bossEnemy.body.collideWorldBounds = true;
+    }
+   
+   //Game Effects
+     if(this.showReturn && this.time.now > this.showReturn && !this.returnText){
+       this.returnText = this.add.text(
+        this.game.width / 2, this.game.height / 2 + 100,
+        'Press Space to return to the main Menu',
+        { font: '26px serif', fill: '#fff'}
+        );
+        this.returnText.anchor.setTo(0.5, 0.5);
+     }
    
   },
  
@@ -310,7 +361,13 @@ BasicGame.Game.prototype = {
     } else {
       this.explode(enemy);
       this.spawnPowerUp(enemy);
-      this.addToScore(BasicGame.ENEMY_REWARD);
+      this.addToScore(enemy.reward);
+      
+      //Boss death handler
+        if(enemy.key === 'bossEnemy') {
+          this.bossEnemyPool.destroy();
+          this.displayEnd(true);
+        }
     }
   },
   
@@ -318,9 +375,49 @@ BasicGame.Game.prototype = {
     this.score += reward;
     this.scoreText.text = this.score;
     
-    if (this.score >= 5000) {
+    if (this.score >= 100 && this.bossEnemyPool.countDead() === 1) {
       this.smallTargetPool.destroy();
-      this.displayEnd(true);
+      this.spawnBossEnemy();
+    }
+  },
+  
+  spawnBossEnemy: function () {
+    this.bossUnlocked = true;
+    this.bossEnemy.reset(this.game.width / 2, -40, BasicGame.BOSS_HEALTH);
+    this.physics.enable(this.bossEnemy, Phaser.Physics.ARCADE);
+    this.bossEnemy.body.velocity.y = BasicGame.BOSS_Y_VELOCITY;
+    this.bossEnemy.play('fly');
+  },
+  
+  bossFire: function () {
+    if (this.bossUnlocked === false && this.boss.alive && this.boss.nextShotAt < this.time.now 
+    && this.enemyBulletPool.countDead() >= 10) {
+      
+      this.bossEnemy.nextShotAt = this.time.now + BasicGame.BOSS_SHOT_DELAY;
+      
+      for (var i = 0; i < 5; i++) {
+        var leftBullet = this.enemyBulletPool.getFirstExists(false);
+        leftBullet.reset(this.boss.x + 10 + i * 10, this.boss.y + 20);
+        var rightBullet = this.enemyBulletPool.getFirstExists(false);
+        rightBullet.reset(this.boss.x - 10 + i * 10, this.boss.y + 20);
+        
+        if(this.boss.health > BasicGame.BOSS_HEALTH / 2) {
+          this.physics.arcade.moveToObject(
+            leftBullet, this.player, BasicGame.ENEMY_BULLET_VELOCITY
+          );
+          this.physics.arcade.moveToObject(
+            rightBullet, this.player, BasicGame.ENEMY_BULLET_VELOCITY
+          );
+        } else {
+          this.physics.arcade.moveToXY(leftbullet, this.player.x - i * 100, this.player.y, 
+            BasicGame.ENEMY_BULLET_VELOCITY
+          );
+          
+          this.physics.arcade.moveToXY(rightbullet, this.player.x - i * 100, this.player.y, 
+            BasicGame.ENEMY_BULLET_VELOCITY
+          );
+        }
+      }//end for
     }
   },
  
