@@ -10,10 +10,11 @@ BasicGame.Game.prototype = {
     this.load.image('bullet', 'assets/bullet.png');
     this.load.image('enemyBullet', 'assets/enemy-bullet.png');
     this.load.image('powerup1', 'assets/powerup1.png');
-    this.load.spritesheet('smallTarget', 'assets/enemy.png', 42, 42);
+    this.load.spritesheet('smallTarget', 'assets/enemyFighterSpriteSheet.png', 53, 55);
+    this.load.spritesheet('smallShooter', 'assets/enemyShooterSpriteSheet.png', 53, 55);
     this.load.spritesheet('bossEnemy', 'assets/EnemyLargeBig.png', 403, 199);
     this.load.spritesheet('explosion', 'assets/explosion.png', 32, 32);
-    this.load.spritesheet('player', 'assets/player.png', 64, 64);
+    this.load.spritesheet('player', 'assets/FrogfootSpriteSheet.png', 50, 64);
   },
   
   create: function () {
@@ -55,8 +56,8 @@ BasicGame.Game.prototype = {
   setupPlayer: function () {
     this.player = this.add.sprite(this.game.width / 2, this.game.height - 50, 'player');
     this.player.anchor.setTo(0.5, 0.5);
-    this.player.animations.add('fly', [0,1,2], 20, true);
-    this.player.animations.add('ghost', [3, 0, 3, 1], 20, true);
+    this.player.animations.add('fly', [0], 20, true);
+    this.player.animations.add('ghost', [0, 1], 20, true);
     this.player.play('fly');
     this.physics.enable(this.player, Phaser.Physics.ARCADE);
     this.player.speed = 300;
@@ -197,7 +198,7 @@ BasicGame.Game.prototype = {
   },
   
   fire: function() {
-    //delay shot so firing rate isn't insane
+    
     if(!this.player.alive || this.nextShotAt > this.time.now) {
       return;
     }
@@ -212,7 +213,7 @@ BasicGame.Game.prototype = {
       }
       
       bullet = this.bulletPool.getFirstExists(false);
-      bullet.reset(this.player.x, this.player.y - 20);
+      bullet.reset(this.player.x, this.player.y - 30);
       bullet.body.velocity.y = -BasicGame.BULLET_VELOCITY;
       
     } else {
@@ -222,13 +223,13 @@ BasicGame.Game.prototype = {
       for (var i = 0; i < this.weaponLevel; i++) {
         bullet = this.bulletPool.getFirstExists(false);
         // spawn left bullet slightly left off center
-        bullet.reset(this.player.x - (10 + i * 6), this.player.y - 20);
+        bullet.reset(this.player.x - (10 + i * 6), this.player.y - 30);
         // the left bullets spread from -95 degrees to -135 degrees
         this.physics.arcade.velocityFromAngle( -95 - i * 10, BasicGame.BULLET_VELOCITY, bullet.body.velocity);
         
         bullet = this.bulletPool.getFirstExists(false);
         // spawn right bullet slightly right off center
-        bullet.reset(this.player.x + (10 + i * 6), this.player.y - 20);
+        bullet.reset(this.player.x + (10 + i * 6), this.player.y - 30);
         // the right bullets spread from -85 degrees to -45
         this.physics.arcade.velocityFromAngle(-85 + i * 10, BasicGame.BULLET_VELOCITY, bullet.body.velocity);
       }
@@ -376,7 +377,7 @@ BasicGame.Game.prototype = {
     this.scoreText.text = this.score;
     
     if (this.score >= 100 && this.bossEnemyPool.countDead() === 1) {
-      this.smallTargetPool.destroy();
+      this.enemyFlee();
       this.spawnBossEnemy();
     }
   },
@@ -387,6 +388,12 @@ BasicGame.Game.prototype = {
     this.physics.enable(this.bossEnemy, Phaser.Physics.ARCADE);
     this.bossEnemy.body.velocity.y = BasicGame.BOSS_Y_VELOCITY;
     this.bossEnemy.play('fly');
+  },
+  
+  enemyFlee: function () {
+    //purpose of this function is to change smallTargetPool to fly off screen instead
+    //of dissapearing like they currently do
+    this.smallTargetPool.destroy(); //DEBUG
   },
   
   bossFire: function () {
