@@ -136,7 +136,7 @@ BasicGame.Game.prototype = {
       //boss animations
       this.bossEnemyPool.forEach(function (boss) {
         boss.animations.add('fly', [0, 1, 1], 20, true);
-        boss.animations.add('hit', [1, 3, 2, 0], 20, true);
+        boss.animations.add('hit', [1, 3, 2, 0], 20, false);
         
         boss.events.onAnimationComplete.add( function (b) {
           b.play('fly');
@@ -247,15 +247,14 @@ BasicGame.Game.prototype = {
   },
   
   enemyFire: function() {
+    //cycle through each enemy capable of firing that is alive
     this.shooterPool.forEachAlive(function (enemy) {
-      console.log('enemy Next Shot = ' + enemy.nextShotAt);
-      console.log('timenow = ' + this.time.now);
+      //check enemy to see if just fired to prevent insane firing rate
       if (this.time.now > enemy.nextShotAt && this.smallShooterBulletPool.countDead() > 0) {
-        console.log('enemyFired!');
         var bullet = this.smallShooterBulletPool.getFirstExists(false);
         //fires bullet from enemies AnchorPoint
         bullet.reset(enemy.x, enemy.y);
-        
+        //moves bullet to player location
         this.physics.arcade.moveToObject(bullet, this.player, BasicGame.ENEMY_BULLET_VELOCITY);
         enemy.nextShotAt = this.time.now + BasicGame.SHOOTER_SHOT_DELAY
       }
