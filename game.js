@@ -248,11 +248,11 @@ BasicGame.Game.prototype = {
   
   enemyFire: function() {
     this.shooterPool.forEachAlive(function (enemy) {
-      console.log('enemy Next Shot = ' + enemy.NextShotAt);
+      console.log('enemy Next Shot = ' + enemy.nextShotAt);
       console.log('timenow = ' + this.time.now);
-      if (this.time.now > enemy.NextShotAt && this.enemyBulletPool.countDead() > 0) {
+      if (this.time.now > enemy.nextShotAt && this.smallShooterBulletPool.countDead() > 0) {
         console.log('enemyFired!');
-        var bullet = this.enemyBulletPool.getFirstExists(false);
+        var bullet = this.smallShooterBulletPool.getFirstExists(false);
         //fires bullet from enemies AnchorPoint
         bullet.reset(enemy.x, enemy.y);
         
@@ -312,7 +312,7 @@ BasicGame.Game.prototype = {
     //player collision check
     this.physics.arcade.overlap(this.player, this.smallTargetPool, this.playerHit, null, this);
     this.physics.arcade.overlap(this.player, this.shooterPool, this.playerHit, null, this);
-    this.physics.arcade.overlap(this.player, this.enemyBulletPool, this.playerHit, null, this);
+    this.physics.arcade.overlap(this.player, this.smallShooterBulletPool, this.playerHit, null, this);
     this.physics.arcade.overlap(this.player, this.powerUpPool, this.playerPowerUp, null, this);
     
     this.physics.arcade.overlap(this.player, this.shooterPool, this.playerHit, null, this);
@@ -493,14 +493,14 @@ BasicGame.Game.prototype = {
   
   bossFire: function () {
     if (this.bossUnlocked === false && this.boss.alive && this.boss.nextShotAt < this.time.now 
-    && this.enemyBulletPool.countDead() >= 10) {
+    && this.smallShooterBulletPool.countDead() >= 10) {
       
       this.bossEnemy.nextShotAt = this.time.now + BasicGame.BOSS_SHOT_DELAY;
       
       for (var i = 0; i < 5; i++) {
-        var leftBullet = this.enemyBulletPool.getFirstExists(false);
+        var leftBullet = this.smallShooterBulletPool.getFirstExists(false);
         leftBullet.reset(this.boss.x + 10 + i * 10, this.boss.y + 20);
-        var rightBullet = this.enemyBulletPool.getFirstExists(false);
+        var rightBullet = this.smallShooterBulletPool.getFirstExists(false);
         rightBullet.reset(this.boss.x - 10 + i * 10, this.boss.y + 20);
         
         if(this.boss.health > BasicGame.BOSS_HEALTH / 2) {
