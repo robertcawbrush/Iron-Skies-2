@@ -12,7 +12,7 @@ BasicGame.Game.prototype = {
     this.load.image('powerup1', 'assets/powerup1.png');
     this.load.spritesheet('smallTarget', 'assets/SmallTarget.png', 55, 60);
     this.load.spritesheet('smallShooter', 'assets/SmallShooter.png', 55, 60);
-    this.load.spritesheet('bossEnemy', 'assets/EnemyLargeBig.png', 403, 199);
+    this.load.spritesheet('bossEnemy', 'assets/EnemyLargeBig.png', 406, 199);
     this.load.spritesheet('explosion', 'assets/explosion.png', 32, 32);
     this.load.spritesheet('player', 'assets/FrogfootSpriteSheet.png', 50, 64);
   },
@@ -63,7 +63,7 @@ BasicGame.Game.prototype = {
     this.physics.enable(this.player, Phaser.Physics.ARCADE);
     this.player.speed = 300;
     this.player.body.collideWorldBounds = true;
-    this.player.body.setSize(20,20,0,-5);
+    this.player.body.setSize(20,35,0,-5);
     this.weaponLevel = 0;
   },
   
@@ -259,6 +259,8 @@ BasicGame.Game.prototype = {
         enemy.nextShotAt = this.time.now + BasicGame.SHOOTER_SHOT_DELAY
       }
     }, this);
+    
+    this.bossFire();
   },
   
   fire: function() {
@@ -428,7 +430,7 @@ BasicGame.Game.prototype = {
   },
  
   playerHit: function (player, enemy){
-    if(this.ghostUntil && this.ghostUntil > this.time.now) {
+    if(this.ghostUntil && this.ghostUntil > this.time.now || this.returnText && this.returnText.exists) {
       return;
     }
   
@@ -491,35 +493,33 @@ BasicGame.Game.prototype = {
   },
   
   bossFire: function () {
-    if (this.bossUnlocked === false && this.boss.alive && this.boss.nextShotAt < this.time.now 
+    if (this.bossUnlocked === false && this.bossEnemy.alive && this.bossEnemy.nextShotAt < this.time.now 
     && this.smallShooterBulletPool.countDead() >= 10) {
       
-      this.bossEnemy.nextShotAt = this.time.now + BasicGame.BOSS_SHOT_DELAY;
+      if(this.bossEnemy.health > BasicGame.BOSS_HEALTH / 2){
+        this.bossEnemy.nextShotAt = this.time.now + BasicGame.BOSS_SHOT_DELAY1;
+      } else if (this.bossEnemy.health > BasicGame.BOSS_HEALTH / 3) {
+        this.bossEnemy.nextShotAt = this.time.now + BasicGame.BOSS_SHOT_DELAY2;
+      } else {
+        this.bossEnemy.nextShotAt = this.time.now + BasicGame.BOSS_SHOT_DELAY3;
+      }
       
       for (var i = 0; i < 5; i++) {
         var leftBullet = this.smallShooterBulletPool.getFirstExists(false);
-        leftBullet.reset(this.boss.x + 10 + i * 10, this.boss.y + 20);
+        leftBullet.reset(this.bossEnemy.x + 70 + i * 10, this.bossEnemy.y + 20);
         var rightBullet = this.smallShooterBulletPool.getFirstExists(false);
-        rightBullet.reset(this.boss.x - 10 + i * 10, this.boss.y + 20);
+        rightBullet.reset(this.bossEnemy.x - 70 + i * 10, this.bossEnemy.y + 20);
         
-        if(this.boss.health > BasicGame.BOSS_HEALTH / 2) {
-          this.physics.arcade.moveToObject(
-            leftBullet, this.player, BasicGame.ENEMY_BULLET_VELOCITY
-          );
-          this.physics.arcade.moveToObject(
-            rightBullet, this.player, BasicGame.ENEMY_BULLET_VELOCITY
-          );
-        } else {
-          this.physics.arcade.moveToXY(leftbullet, this.player.x - i * 100, this.player.y, 
+         
+          this.physics.arcade.moveToXY(rightBullet, this.player.x + i * 100, this.player.y, 
             BasicGame.ENEMY_BULLET_VELOCITY
           );
-          
-          this.physics.arcade.moveToXY(rightbullet, this.player.x - i * 100, this.player.y, 
+          this.physics.arcade.moveToXY(leftBullet, this.player.x + i * 100, this.player.y, 
             BasicGame.ENEMY_BULLET_VELOCITY
           );
-        }
+        
       }//end for
-    }
+    }//end function requirement check
   },
  
   explode: function (sprite) {
