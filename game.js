@@ -471,7 +471,7 @@ BasicGame.Game.prototype = {
     this.score += reward;
     this.scoreText.text = this.score;
     
-    if (this.score >= 100 && this.bossEnemyPool.countDead() === 1) {
+    if (this.score >= 5000 && this.bossEnemyPool.countDead() === 1) {
       this.enemyFlee();
       this.spawnBossEnemy();
     }
