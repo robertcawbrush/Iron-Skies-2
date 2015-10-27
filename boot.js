@@ -16,8 +16,8 @@ var BasicGame = {
   SHOT_DELAY: Phaser.Timer.SECOND * 0.1,
   SHOOTER_SHOT_DELAY: Phaser.Timer.SECOND * 2,
   BOSS_SHOT_DELAY1: Phaser.Timer.SECOND,
-  BOSS_SHOT_DELAY2: Phaser.Time.SECOND * 0.8,
-  BOSS_SHOT_DELAY3: Phaser.Time.SECOND * 0.6,
+  BOSS_SHOT_DELAY2: Phaser.Time.SECOND * 1.8,
+  BOSS_SHOT_DELAY3: Phaser.Time.SECOND * 1.6,
 
   ENEMY_HEALTH: 2,
   SHOOTER_HEALTH: 2,

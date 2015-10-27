@@ -496,13 +496,7 @@ BasicGame.Game.prototype = {
     if (this.bossUnlocked === false && this.bossEnemy.alive && this.bossEnemy.nextShotAt < this.time.now 
     && this.smallShooterBulletPool.countDead() >= 10) {
       
-      if(this.bossEnemy.health > BasicGame.BOSS_HEALTH / 2){
         this.bossEnemy.nextShotAt = this.time.now + BasicGame.BOSS_SHOT_DELAY1;
-      } else if (this.bossEnemy.health > BasicGame.BOSS_HEALTH / 3) {
-        this.bossEnemy.nextShotAt = this.time.now + BasicGame.BOSS_SHOT_DELAY2;
-      } else {
-        this.bossEnemy.nextShotAt = this.time.now + BasicGame.BOSS_SHOT_DELAY3;
-      }
       
       for (var i = 0; i < 5; i++) {
         var leftBullet = this.smallShooterBulletPool.getFirstExists(false);
