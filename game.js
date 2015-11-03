@@ -4,18 +4,6 @@ BasicGame.Game = function (game) {
 };
 
 BasicGame.Game.prototype = {
-
-  preload: function () {
-    this.load.image('sea', 'assets/sea.png');
-    this.load.image('bullet', 'assets/bullet.png');
-    this.load.image('enemyBullet', 'assets/enemy-bullet.png');
-    this.load.image('powerup1', 'assets/powerup1.png');
-    this.load.spritesheet('smallTarget', 'assets/SmallTarget.png', 55, 60);
-    this.load.spritesheet('smallShooter', 'assets/SmallShooter.png', 55, 60);
-    this.load.spritesheet('bossEnemy', 'assets/EnemyLargeBig.png', 406, 199);
-    this.load.spritesheet('explosion', 'assets/explosion.png', 32, 32);
-    this.load.spritesheet('player', 'assets/FrogfootSpriteSheet.png', 50, 64);
-  },
   
   create: function () {
     
@@ -45,7 +33,12 @@ BasicGame.Game.prototype = {
   },
   
   render: function() {
-    //this.game.debug.body(this.player);
+    //DEBUG HITBOXES
+      //this.game.debug.body(this.player);
+      
+      this.bossEnemyPool.forEach(function (enemy) {
+        this.game.debug.body(enemy);
+      }, this);
   },
   
   setupBackground: function () {
@@ -82,7 +75,7 @@ BasicGame.Game.prototype = {
       
       //smallTarget Animations
       this.smallTargetPool.forEach(function (enemy) {
-        enemy.animations.add('fly', [0,1,2], 20, true);
+        enemy.animations.add('fly', [0, 1, 2], 20, true);
         enemy.animations.add('hit', [3, 1, 3, 2], 20, false);
         
         enemy.events.onAnimationComplete.add( function(e){
@@ -124,7 +117,7 @@ BasicGame.Game.prototype = {
     //boss properties
       this.bossEnemyPool = this.add.group();
       this.bossEnemyPool.enableBody = true;
-      this.bossEnemyPool.physicsBodyType = Phaser.Physics.ARCADE;
+      this.bossEnemyPool.physicsBodyType = Phaser.Physics.P2;
       this.bossEnemyPool.createMultiple(1, 'bossEnemy');
       this.bossEnemyPool.setAll('anchor.x', 0.5);
       this.bossEnemyPool.setAll('anchor.y', 0.5);
@@ -471,7 +464,7 @@ BasicGame.Game.prototype = {
     this.score += reward;
     this.scoreText.text = this.score;
     
-    if (this.score >= 5000 && this.bossEnemyPool.countDead() === 1) {
+    if (this.score >= BasicGame.DEBUG_SPAWN_SCORE && this.bossEnemyPool.countDead() === 1) {
       this.enemyFlee();
       this.spawnBossEnemy();
     }
@@ -500,17 +493,26 @@ BasicGame.Game.prototype = {
       
       for (var i = 0; i < 5; i++) {
         var leftBullet = this.smallShooterBulletPool.getFirstExists(false);
-        leftBullet.reset(this.bossEnemy.x + 70 + i * 10, this.bossEnemy.y + 20);
+        leftBullet.reset(this.bossEnemy.x + 90 + i * 10, this.bossEnemy.y + 70);
         var rightBullet = this.smallShooterBulletPool.getFirstExists(false);
-        rightBullet.reset(this.bossEnemy.x - 70 + i * 10, this.bossEnemy.y + 20);
+        rightBullet.reset(this.bossEnemy.x - 100 + i * 10, this.bossEnemy.y + 70);
         
-         
+         if(this.bossEnemy.health > BasicGame.BOSS_HEALTH / 2){
+          //Phase 1 of boss fight
+          rightBullet.body.velocity.y = BasicGame.ENEMY_BULLET_VELOCITY;
+          rightBullet.body.velocity.x = i * 120;
+          leftBullet.body.velocity.y = BasicGame.ENEMY_BULLET_VELOCITY;
+          leftBullet.body.velocity.x = i * 120;
+         } else {
+          //Phase 2 of boss fight
           this.physics.arcade.moveToXY(rightBullet, this.player.x + i * 100, this.player.y, 
             BasicGame.ENEMY_BULLET_VELOCITY
           );
           this.physics.arcade.moveToXY(leftBullet, this.player.x + i * 100, this.player.y, 
             BasicGame.ENEMY_BULLET_VELOCITY
           );
+         }
+      
         
       }//end for
     }//end function requirement check

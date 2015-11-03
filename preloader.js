@@ -18,15 +18,16 @@ BasicGame.Preloader.prototype = {
 
     this.load.setPreloadSprite(this.preloadBar);
 
-    // load the rest of the assets 
-    this.load.image('titlePage', 'assets/ironSkiesTitle.png');
+    // load the rest of the visual assets 
     this.load.image('sea', 'assets/sea.png');
     this.load.image('bullet', 'assets/bullet.png');
     this.load.image('enemyBullet', 'assets/enemy-bullet.png');
-    this.load.image('powerup1', 'assets/powerup1.png');
-    this.load.spritesheet('smallTarget', 'assets/enemy.png', 42, 42);
+    this.load.image('powerup1', 'assets/gunPowerUp.png');
+    this.load.spritesheet('smallTarget', 'assets/SmallTarget.png', 55, 60);
+    this.load.spritesheet('smallShooter', 'assets/SmallShooter.png', 55, 60);
+    this.load.spritesheet('bossEnemy', 'assets/EnemyLargeBig.png', 406, 199);
     this.load.spritesheet('explosion', 'assets/explosion.png', 32, 32);
-    this.load.spritesheet('player', 'assets/player.png', 64, 64);
+    this.load.spritesheet('player', 'assets/FrogfootSpriteSheet.png', 50, 64);
   },
 
   create: function () {
