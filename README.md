@@ -2,8 +2,6 @@
 Iron skies 2 is sequel to the SHMUP(shoot em up) I made back in the day with a friend. We had so many ideas for the first one
 but we're unable to commit enough time due to schoolwork and our day jobs. 
 
-Not the sequel though, I intend to see this one all the way through.
-
 You can find IRON SKIES 2 hosted here: http://robertcawbrush.github.io/IronSkies2/ 
 
 <br>
