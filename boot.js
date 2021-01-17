@@ -60,8 +60,6 @@ BasicGame.Boot.prototype = {
 
     this.input.maxPointers = 1;
 
-    // this.stage.disableVisibilityChange = true;
-
     if (this.game.device.desktop) {
 
     } else {

@@ -4,8 +4,6 @@ BasicGame.Preloader = function (game) {
   this.background = null;
   this.preloadBar = null;
 
-  //this.ready = false;
-
 };
 
 BasicGame.Preloader.prototype = {
@@ -37,13 +35,8 @@ BasicGame.Preloader.prototype = {
   },
 
   update: function () {
-
-    
-    //if (this.cache.isSoundDecoded('titleMusic') && this.ready == false)
-    //{
-    //  this.ready = true;
+   
       this.state.start('MainMenu');
-    //}
 
   }
 

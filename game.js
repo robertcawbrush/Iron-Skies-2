@@ -16,7 +16,6 @@ BasicGame.Game.prototype = {
     this.setupText();
  
     //input inits
-      //arrow keys
       this.cursors = this.input.keyboard.createCursorKeys();
       
       //everything else
@@ -33,8 +32,6 @@ BasicGame.Game.prototype = {
   },
   
   render: function() {
-    //DEBUG HITBOXES
-      //this.game.debug.body(this.player);
       
       this.bossEnemyPool.forEach(function (enemy) {
         this.game.debug.body(enemy);
@@ -325,7 +322,6 @@ BasicGame.Game.prototype = {
       this.nextEnemyAt = this.time.now + this.enemyDelay;
       var enemy = this.smallTargetPool.getFirstExists(false);
       
-      //DEBUG
       enemy.reset(this.rnd.integerInRange(20, this.game.width - 20), 0, BasicGame.ENEMY_HEALTH);
  
       //randomize speed
@@ -338,7 +334,7 @@ BasicGame.Game.prototype = {
       this.nextShooterAt = this.time.now + this.shooterDelay;
       var shooter = this.shooterPool.getFirstExists(false);
       
-      //Random spawn near top of field(DEBUG WILL BE SCRIPTED IN FUTURE)
+      //Random spawn near top of field
         shooter.reset(this.rnd.integerInRange(20, this.game.width - 20), 0, BasicGame.SHOOTER_HEALTH);
         
       //target desitnation
@@ -479,10 +475,8 @@ BasicGame.Game.prototype = {
   },
   
   enemyFlee: function () {
-    //purpose of this function is to change the small enemy pools to fly off screen instead
-    //of dissapearing like they currently do
-    this.smallTargetPool.destroy(); //DEBUG
-    this.shooterPool.destroy(); //DEBUG
+    this.smallTargetPool.destroy();
+    this.shooterPool.destroy();
   },
   
   bossFire: function () {
@@ -514,8 +508,8 @@ BasicGame.Game.prototype = {
          }
       
         
-      }//end for
-    }//end function requirement check
+      }
+    }
   },
  
   explode: function (sprite) {
@@ -551,7 +545,6 @@ BasicGame.Game.prototype = {
   },
  
   displayEnd: function(win) {
-    //check if text already exists
     if (this.endText && this.endText.exists){
       return;
     }
