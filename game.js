@@ -34,7 +34,9 @@ BasicGame.Game.prototype = {
   render: function() {
       
       this.bossEnemyPool.forEach(function (enemy) {
-        this.game.body(enemy);
+          if (this.game !== undefined && this.game.body !== undefined) {
+              this.game.body(enemy);
+          }
       }, this);
   },
   
